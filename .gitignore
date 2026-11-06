@@ -1,0 +1,44 @@
+# Dependencies & Environments
+node_modules/
+.venv/
+env/
+venv/
+
+# Build artifacts
+.next/
+out/
+build/
+dist/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Binary & Executables
+bin/
+*.exe
+*.dll
+
+# Environment & Sensitive Credentials (IMP FILES)
+.env
+.env.*
+!.env.example
+!.env.local.example
+*.pem
+*.key
+*.cert
+
+# Documentation & Markdown files (NO .MD FILES AS REQUESTED)
+*.md
+
+# Local logs & debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# IDE & Editor configs
+.vscode/
+.idea/
+
+# Local batch scripts
+*.bat
