@@ -19,11 +19,8 @@ bin/
 *.exe
 *.dll
 
-# Environment & Sensitive Credentials (IMP FILES)
-.env
-.env.*
-!.env.example
-!.env.local.example
+# Environment & Sensitive Credentials (NO .ENV / SECRETS)
+.env*
 *.pem
 *.key
 *.cert

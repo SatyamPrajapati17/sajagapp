@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+langgraph
+langchain-core
+langchain-nvidia-ai-endpoints
+supabase
+retell-sdk
+pydantic
+python-dotenv
+httpx
+reportlab
+pytest
+pytest-asyncio
+websockets
+

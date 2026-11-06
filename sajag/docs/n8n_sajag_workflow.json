@@ -1,0 +1,293 @@
+{
+  "name": "Sajag AI — Realtime Fraud Event Dispatcher & SMS Alerts",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sajag-events",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "id": "node-webhook-trigger",
+      "name": "Sajag Webhook Listener",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "webhookId": "sajag-events-webhook-id",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "sajag-header-auth",
+          "name": "Sajag Header Secret"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.event }}",
+                    "rightValue": "takeover_pending",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "takeover_pending"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.event }}",
+                    "rightValue": "takeover_started",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "takeover_started"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.event }}",
+                    "rightValue": "identifier_found",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "identifier_found"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.event }}",
+                    "rightValue": "report_ready",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "report_ready"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-event-router",
+      "name": "Route by Event",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "from": "={{ $env.TWILIO_PHONE_NUMBER }}",
+        "to": "={{ $json.body.payload.family_phone || '+919876543210' }}",
+        "message": "={{ '🚨 [SAJAG CRITICAL ALERT] High-risk scam call detected on elder line! Threat: ' + $json.body.category + ' (Risk: ' + ($json.body.p_scam * 100).toFixed(0) + '%). Autonomous Decoy (Ramesh Sharma) engaging in 3 seconds. To cancel, open dashboard.' }}"
+      },
+      "id": "node-twilio-sms-pending",
+      "name": "SMS: 3s Warning to Family",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [760, 160],
+      "credentials": {
+        "twilioApi": {
+          "id": "sajag-twilio-account",
+          "name": "Twilio Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "={{ $env.TWILIO_PHONE_NUMBER }}",
+        "to": "={{ $json.body.payload.family_phone || '+919876543210' }}",
+        "message": "={{ '🛡️ [SAJAG DECOY ENGAGED] Ramesh Sharma persona is now actively scam-baiting the fraudster. Line secured. Zero credentials will be disclosed.' }}"
+      },
+      "id": "node-twilio-sms-active",
+      "name": "SMS: Decoy Engaged Alert",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [760, 280],
+      "credentials": {
+        "twilioApi": {
+          "id": "sajag-twilio-account",
+          "name": "Twilio Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "={{ $env.TWILIO_PHONE_NUMBER }}",
+        "to": "={{ $json.body.payload.family_phone || '+919876543210' }}",
+        "message": "={{ '📋 [SAJAG DOSSIER READY] Scam call ended. Evidence dossier compiled with captured mule handles. Open http://localhost:3000/reports to review and approve for 1930 submission.' }}"
+      },
+      "id": "node-twilio-sms-report",
+      "name": "SMS: 1930 Dossier Ready",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [760, 420],
+      "credentials": {
+        "twilioApi": {
+          "id": "sajag-twilio-account",
+          "name": "Twilio Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL + '/rest/v1/alerts' }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_ROLE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  call_id: $json.body.call_id,\n  kind: $json.body.event,\n  channel: 'sms',\n  to_addr: $json.body.payload.family_phone || '+919876543210',\n  status: 'sent'\n}) }}"
+      },
+      "id": "node-supabase-log-alert",
+      "name": "Log Alert to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1020, 280]
+    }
+  ],
+  "connections": {
+    "Sajag Webhook Listener": {
+      "main": [
+        [
+          {
+            "node": "Route by Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Event": {
+      "main": [
+        [
+          {
+            "node": "SMS: 3s Warning to Family",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SMS: Decoy Engaged Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "SMS: 1930 Dossier Ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS: 3s Warning to Family": {
+      "main": [
+        [
+          {
+            "node": "Log Alert to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS: Decoy Engaged Alert": {
+      "main": [
+        [
+          {
+            "node": "Log Alert to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SMS: 1930 Dossier Ready": {
+      "main": [
+        [
+          {
+            "node": "Log Alert to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
+

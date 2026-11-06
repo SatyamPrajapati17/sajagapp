@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #050B14;
+  --panel: #0A1626;
+  --line: #12304A;
+  --cyan: #22E5FF;
+  --green: #3DFF8A;
+  --lime: #E4FF3A;
+  --danger: #FF4D5E;
+  --amber: #FFB020;
+  --text: #D7E6F5;
+  --mute: #6F8AA6;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-style: italic;
+  font-family: var(--font-jakarta), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Gradient typography */
+.grad {
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--lime));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-style: italic;
+  font-weight: 800;
+}
+
+.grad-danger {
+  background: linear-gradient(90deg, #FF4D5E, #FFB020);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-style: italic;
+  font-weight: 800;
+}
+
+/* HUD Corner Brackets & Panel */
+.hud {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: 0 0 24px rgba(34, 229, 255, 0.12);
+  position: relative;
+}
+
+.hud::before,
+.hud::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--cyan);
+  pointer-events: none;
+}
+
+.hud::before {
+  top: -1px;
+  left: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.hud::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: 0;
+  border-top: 0;
+}
+
+/* Dark Matrix Grid Background */
+.gridbg {
+  background-image: 
+    linear-gradient(#0e2438 1px, transparent 1px),
+    linear-gradient(90deg, #0e2438 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Hero Gradient */
+.hero-gradient {
+  background: radial-gradient(60% 60% at 30% 20%, #E4FF3A 0%, #3DFF8A 45%, #22E5FF 100%);
+}
+
+/* Critical Pulse */
+@keyframes criticalPulse {
+  0%, 100% { border-color: #FF4D5E; box-shadow: 0 0 15px rgba(255, 77, 94, 0.4); }
+  50% { border-color: #FFB020; box-shadow: 0 0 30px rgba(255, 77, 94, 0.8); }
+}
+
+.pulse-critical {
+  animation: criticalPulse 1.2s infinite ease-in-out;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #050B14;
+}
+::-webkit-scrollbar-thumb {
+  background: #12304A;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #22E5FF;
+}
