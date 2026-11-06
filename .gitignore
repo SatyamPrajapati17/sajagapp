@@ -25,8 +25,11 @@ bin/
 *.key
 *.cert
 
-# Documentation & Markdown files (NO .MD FILES AS REQUESTED)
+# Documentation & Markdown files (Only official README tracked)
+docs/
 *.md
+!README.md
+!sajag/frontend/README.md
 
 # Local logs & debug
 *.log
